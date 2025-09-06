@@ -1,0 +1,6 @@
+*.ipynb
+*draft*
+*test*
+/backup
+/out
+/References
