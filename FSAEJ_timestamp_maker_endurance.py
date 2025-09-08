@@ -5,19 +5,33 @@ import re
 
 import pandas as pd
 
+
 # %%
-url = "http://jsae-res.com/result/listup/?race_id=4&day=2"
+def sec2timestamp(sec):
+    m, s = divmod(sec, 60)
+    h, m = divmod(m, 60)
+    return f"{int(h):02d}:{int(m):02d}:{math.floor(s):02d}"
+
+
+# %%
+# user parameters for main run
+url = "https://web.archive.org/web/20250323214925/http://jsae-res.com/result/listup/?race_id=4&day=2"
+# format> hh:mm:ss
+reference_timestamp = "00:00:00"
+reference_time = "07:50:30"
+live_delay = "00:00:09"
+# parameters for follow-up run
+held_followup = False
+starttime_followup = "16:00:00"
+
+# %%
 df = pd.read_html(url, match="Car#")[0]
 print(df.head())
 
 # %%
-print("N/A")
-index_na = df["hh:mm:ss"] == "--:--:--"
-print(df[index_na])
+print("N/A list")
+print(df[df["hh:mm:ss"] == "--:--:--"])
 df = df[df["hh:mm:ss"] != "--:--:--"]
-
-# df.loc[index_na, "hh:mm:ss"] = np.nan
-# df[index_na]
 
 # %%
 df["TIME"] = pd.to_datetime(df["TIME"], format='%M"%S.%f') - pd.to_datetime(
@@ -26,22 +40,13 @@ df["TIME"] = pd.to_datetime(df["TIME"], format='%M"%S.%f') - pd.to_datetime(
 df["hh:mm:ss"] = pd.to_datetime(df["hh:mm:ss"], format="%X")
 
 # %%
-# format> hh:mm:ss
-live_delay = "00:00:09"
-datum_timestamp = "00:00:00"
-datum_time = "07:50:30"
-
-# parameters for follow-up run
-held_followup = False
-starttime_followup = "16:00:00"
-
 live_delay = pd.to_datetime(live_delay, format="%X") - pd.to_datetime(
     "00:00:00", format="%X"
 )
-datum_timestamp = pd.to_datetime(datum_timestamp, format="%X") - pd.to_datetime(
+reference_timestamp = pd.to_datetime(reference_timestamp, format="%X") - pd.to_datetime(
     "00:00:00", format="%X"
 )
-datum_time = pd.to_datetime(datum_time, format="%X")
+reference_time = pd.to_datetime(reference_time, format="%X")
 
 starttime_followup = pd.to_datetime(starttime_followup, format="%X")
 
@@ -49,7 +54,9 @@ starttime_followup = pd.to_datetime(starttime_followup, format="%X")
 df["Follow-up"] = False
 if held_followup:
     df["Follow-up"] = (df["hh:mm:ss"] - df["TIME"]) > starttime_followup
-df["DELTA"] = df["hh:mm:ss"] - datum_time + datum_timestamp + live_delay - df["TIME"]
+df["DELTA"] = (
+    df["hh:mm:ss"] - reference_time + reference_timestamp + live_delay - df["TIME"]
+)
 print(df.head())
 
 # %%
@@ -70,14 +77,6 @@ print(df.head())
 
 # %%
 l_team = df["Name"].unique()
-
-
-# %%
-def sec2timestamp(sec):
-    m, s = divmod(sec, 60)
-    h, m = divmod(m, 60)
-    return f"{int(h):02d}:{int(m):02d}:{math.floor(s):02d}"
-
 
 # %%
 followuup_section = False
@@ -101,6 +100,7 @@ for team in l_team:
     l_text.append(team + " " + stamp_selected)
 
 # %%
+# save result
 out_dir = "./out"
 savename_head = "timestamp"
 savename_tail = "race_id_" + url[-7] + "_day_" + url[-1]
@@ -108,12 +108,5 @@ path_save = f"{out_dir}/{savename_head}_{savename_tail}.txt"
 
 os.makedirs(out_dir, exist_ok=True)
 
-with open(path_save, mode="w") as f:
+with open(path_save, mode="w", encoding="utf-8") as f:
     f.write("\n".join(l_text))
-
-# %%
-# df[["Name", "Follow-up", "TIME"]].groupby(["Name", "Follow-up"]).count().sort_values(
-#     "TIME"
-# ).to_csv("./References/total_laps_endurance_day_1.csv")
-
-# %%
