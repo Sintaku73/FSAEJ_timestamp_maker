@@ -15,7 +15,7 @@ Pythonの環境構築後、下記コマンドで必要なライブラリをイ�
 pip install pandas
 ```
 
-本ツールを使用するにあたってYouTube配信に対応する現実の時間を把握する必要があります。必要に応じて[Show YouTube comments while watching](https://chromewebstore.google.com/detail/show-youtube-comments-whi/gonknbphdaoahjnamfjpaincammofgae)などのブラウザ拡張機能をご利用ください。
+本ツールを使用するにあたってYouTube配信に対応する現実の時間を把握する必要があります。必要に応じて[YouTubeLiveClock](https://chromewebstore.google.com/detail/youtubeliveclock/chpodcedholiggcllnmmjlnghllddgmj)などのブラウザ拡張機能をご利用ください。
 
 ### Installing
 
@@ -42,4 +42,5 @@ git clone https://github.com/Sintaku73/FSAEJ-timestamp-maker.git
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## References
-[^ext]: [Show YouTube comments while watching](https://chromewebstore.google.com/detail/show-youtube-comments-whi/gonknbphdaoahjnamfjpaincammofgae)
+
+[^ext]: [YouTubeLiveClock](https://chromewebstore.google.com/detail/youtubeliveclock/chpodcedholiggcllnmmjlnghllddgmj)
